@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Controllers
 {
@@ -23,12 +24,21 @@ namespace backend.Controllers
         }
         //POST api/questions
         [HttpPost]
-        public void Post([FromBody]Models.Question question)
+        public async Task<IActionResult> Post([FromBody]Models.Question question)
         {
             _context.Questions.
                 Add(question);
-            _context.SaveChanges();
-
+            await _context.SaveChangesAsync();
+            return Ok(question);
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody]Models.Question question)
+        {
+            if (id != question.ID)
+                return BadRequest();
+            _context.Entry(question).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return Ok(question);
         }
     }
 }

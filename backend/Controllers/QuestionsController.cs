@@ -19,11 +19,7 @@ namespace backend.Controllers
         [HttpGet]
         public IEnumerable<Models.Question> Get()
         {
-            return new Models.Question[]
-            {
-                new Models.Question { Text = "Собака" },
-                new Models.Question { Text = "Дичка" }
-            };
+            return _context.Questions;
         }
         //POST api/questions
         [HttpPost]

@@ -17,15 +17,18 @@ namespace backend.Controllers
         {
             this._context = context;
         }
-        [HttpGet]
-        public IEnumerable<Models.Question> Get()
+        [HttpGet("{quizId}")]
+        public IEnumerable<Models.Question> Get([FromRoute]int quizId)
         {
-            return _context.Questions;
+            return _context.Questions.Where(q=>q.QuizId==quizId);
         }
         //POST api/questions
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]Models.Question question)
         {
+            var quiz = _context.Quizzes.SingleOrDefault(q => q.ID == question.QuizId);
+            if (quiz == null)
+                return NotFound();
             _context.Questions.
                 Add(question);
             await _context.SaveChangesAsync();

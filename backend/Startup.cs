@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace backend
 {
@@ -35,6 +36,9 @@ namespace backend
 
             services.AddDbContext<QuizeContext>(opt => opt.UseInMemoryDatabase("quiz"));
 
+            services.AddDbContext<UserDbContext>(opt => opt.UseInMemoryDatabase("user"));
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<UserDbContext>();
             services.AddMvc();
         }
 

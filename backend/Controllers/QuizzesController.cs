@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,7 @@ namespace backend.Controllers
             return _context.Quizzes;
         }
         //POST api/questions
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]Models.Quiz quiz)
         {

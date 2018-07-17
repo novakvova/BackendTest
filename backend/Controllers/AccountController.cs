@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace backend.Controllers
 {
@@ -39,7 +41,10 @@ namespace backend.Controllers
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
             await _signInManager.SignInAsync(user, isPersistent: false);
-            var jwt = new JwtSecurityToken();
+            var signinKey = new SymmetricSecurityKey
+                (Encoding.UTF8.GetBytes("this is secrec key Semen"));
+            var signinCredentials = new SigningCredentials(signinKey, SecurityAlgorithms.HmacSha256);
+            var jwt = new JwtSecurityToken(signingCredentials: signinCredentials);
             return Ok(new JwtSecurityTokenHandler().WriteToken(jwt));
         }
     }

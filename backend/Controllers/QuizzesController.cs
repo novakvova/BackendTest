@@ -18,8 +18,15 @@ namespace backend.Controllers
         {
             _context = context;
         }
+        [Authorize]
         [HttpGet]
         public IEnumerable<Models.Quiz> Get()
+        {
+            var userId = HttpContext.User.Claims.First().Value;
+            return _context.Quizzes.Where(q=>q.OwnerId==userId);
+        }
+        [HttpGet("all")]
+        public IEnumerable<Models.Quiz> GetAllQuizzes()
         {
             return _context.Quizzes;
         }
@@ -28,6 +35,8 @@ namespace backend.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]Models.Quiz quiz)
         {
+            var userId = HttpContext.User.Claims.First().Value;
+            quiz.OwnerId = userId;
             _context.Quizzes.
                 Add(quiz);
             await _context.SaveChangesAsync();

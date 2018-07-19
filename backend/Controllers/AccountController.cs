@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -41,11 +42,33 @@ namespace backend.Controllers
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
             await _signInManager.SignInAsync(user, isPersistent: false);
+            return Ok(CreateToken(user));
+        }
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody]Credentials credentials)
+        {
+
+            var result = await _signInManager
+                .PasswordSignInAsync(credentials.Email, credentials.Password,
+                false, false);
+            if (!result.Succeeded)
+                return BadRequest();
+            var user = await _userManager.FindByEmailAsync(credentials.Email);
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            return Ok(CreateToken(user));
+        }
+        string CreateToken(IdentityUser user)
+        {
+            var claims = new Claim[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id)
+            };
             var signinKey = new SymmetricSecurityKey
                 (Encoding.UTF8.GetBytes("this is secrec key Semen"));
             var signinCredentials = new SigningCredentials(signinKey, SecurityAlgorithms.HmacSha256);
-            var jwt = new JwtSecurityToken(signingCredentials: signinCredentials);
-            return Ok(new JwtSecurityTokenHandler().WriteToken(jwt));
+            var jwt = new JwtSecurityToken(signingCredentials: signinCredentials,
+                claims: claims);
+            return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
     }
 }
